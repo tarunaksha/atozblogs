@@ -31,8 +31,8 @@ const Header = () => {
         <Button className="w-12 h-8" color="gray" pill>
           <FaMoon />
         </Button>
-        <Link to="/sign-in">
-          <Button size="xs" gradientDuoTone="purpleToBlue">
+        <Link to="/signin">
+          <Button size="xs" gradientDuoTone="purpleToBlue" outline>
             Sign In
           </Button>
         </Link>

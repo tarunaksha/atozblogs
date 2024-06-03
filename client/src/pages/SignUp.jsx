@@ -65,7 +65,7 @@ const SignUp = () => {
         <div className="flex-1">
           {/* to get equal space for left and right side */}
           <Link to="/" className="font-bold dark:text-white text-4xl">
-            <span className="px-2 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-white">
+            <span className="px-2 py-1 bg-gradient-to-r from-blue-500 via-lime-500 to-green-500 rounded-lg text-white">
               A to Z{" "}
             </span>
             Blogs
@@ -114,7 +114,7 @@ const SignUp = () => {
               />
             </div>
             <Button
-              gradientDuoTone="purpleToPink"
+              gradientDuoTone="tealToLime"
               size="lg"
               type="submit"
               disabled={loading}

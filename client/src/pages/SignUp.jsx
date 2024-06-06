@@ -1,13 +1,18 @@
 import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { clearMessages, setValidationError, signUp } from "../redux/user/userSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({});
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { loading, errorMessage, successMessage } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    dispatch(clearMessages());
+  }, [dispatch]);
 
   const handleChange = (e) => {
     setFormData({
@@ -15,46 +20,17 @@ const SignUp = () => {
       [e.target.id]: e.target.value.trim(),
     });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.username || !formData.email || !formData.password) {
-      setErrorMessage("Please fill in all fields");
-      setSuccessMessage(""); // Clear success message
+      dispatch(setValidationError('Please fill in all fields'));
       return;
     }
-
-    try {
-      setErrorMessage(""); // Clear error message
-      setSuccessMessage(""); // Clear success message
-      setLoading(true);
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
-      if (data.success === false) {
-        // console.log(data.message);
-        setErrorMessage("User already exists");
-        setSuccessMessage(""); // Clear success message
-        setLoading(false);
-        return;
-      }
-      // Assume form submission is successful
-      setErrorMessage(""); // Clear error message
-      setSuccessMessage("User created successfully");
-      setLoading(false);
-
-      // Redirect to sign in page
-      if (response.ok) {
-        navigate("/signin");
-      }
-    } catch (error) {
-      setErrorMessage("An unexpected error occurred. Please try again later");
-      setSuccessMessage(""); // Clear success message
-      setLoading(false);
+    dispatch(clearMessages());
+    const resultAction = await dispatch(signUp(formData));
+    if (signUp.fulfilled.match(resultAction)) {
+      navigate('/');
     }
   };
 

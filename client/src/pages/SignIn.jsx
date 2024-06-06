@@ -1,13 +1,16 @@
 import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { clearMessages, setValidationError, signIn } from "../redux/user/userSlice";
+
 
 const SignIn = () => {
   const [formData, setFormData] = useState({});
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { loading, errorMessage, successMessage } = useSelector((state) => state.user);
 
   const handleChange = (e) => {
     setFormData({
@@ -15,48 +18,21 @@ const SignIn = () => {
       [e.target.id]: e.target.value.trim(),
     });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if ( !formData.email || !formData.password) {
-      setErrorMessage("Please fill in all fields");
-      setSuccessMessage(""); // Clear success message
+    if (!formData.email || !formData.password) {
+      dispatch(clearMessages());
+      dispatch(setValidationError('Please fill in all fields'));
       return;
     }
-
-    try {
-      setErrorMessage(""); // Clear error message
-      setSuccessMessage(""); // Clear success message
-      setLoading(true);
-      const response = await fetch("/api/auth/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
-      if (data.success === false) {
-        // console.log(data.message);
-        setErrorMessage("Invalid credentials");
-        setSuccessMessage(""); // Clear success message
-        setLoading(false);
-        return;
-      }
-      // Assume form submission is successful
-      setErrorMessage(""); // Clear error message
-      setSuccessMessage("Signed in successfully");
-      setLoading(false);
-
-      // Redirect to home page
-      if (response.ok) {
-        navigate("/");
-      }
-    } catch (error) {
-      setErrorMessage("An unexpected error occurred. Please try again later");
-      setSuccessMessage(""); // Clear success message
-      setLoading(false);
+    dispatch(clearMessages());
+    const resultAction = await dispatch(signIn(formData));
+    if (signIn.fulfilled.match(resultAction)) {
+      navigate('/');
     }
   };
+
 
   return (
     <div className="min-h-screen mt-20">

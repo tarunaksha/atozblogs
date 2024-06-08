@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Home, Dashboard, About, SignIn, SignUp, Projects } from "./pages";
-import { Header, Footer} from "./components";
-
+import { Header, Footer } from "./components";
+import PrivateRoute from "./components/PrivateRoute";
 
 export default function App() {
   return (
@@ -13,7 +13,9 @@ export default function App() {
         <Route path="/projects" element={<Projects />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route element={<PrivateRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
       </Routes>
       <Footer />
     </BrowserRouter>

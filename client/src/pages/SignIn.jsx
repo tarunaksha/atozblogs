@@ -1,8 +1,9 @@
 import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearMessages, setValidationError, signIn } from "../redux/user/userSlice";
+import OAuth from "../components/OAuth";
 
 
 const SignIn = () => {
@@ -11,6 +12,10 @@ const SignIn = () => {
   const navigate = useNavigate();
 
   const { loading, errorMessage, successMessage } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    dispatch(clearMessages());
+  }, [dispatch]);
 
   const handleChange = (e) => {
     setFormData({
@@ -94,6 +99,7 @@ const SignIn = () => {
                 "Sign In"
               )}
             </Button>
+            <OAuth isSignUp={false}/>
           </form>
           <div className="flex text-sm mt-5">
             <span>

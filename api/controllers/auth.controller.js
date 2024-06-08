@@ -62,3 +62,68 @@ export const signin = async (req, res, next) => {
     next(error);
   }
 };
+
+export const googleSignUp = async (req, res, next) => {
+  const { name, email, googlePhotoURL } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      return res.status(409).json({ message: "User already exists" });
+    }
+
+    const generatedPassword =
+      Math.random().toString(36).slice(-8) +
+      Math.random().toString(36).slice(-8);
+
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(generatedPassword, salt);
+
+    const newUser = new User({
+      username:
+        name.toLowerCase().split(" ").join("") +
+        Math.random().toString(9).slice(-4), // John Doe => johndoe1234
+      email,
+      password: hashedPassword,
+      profilePicture: googlePhotoURL,
+    });
+
+    await newUser.save();
+
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+
+    const { password, ...rest } = newUser._doc;
+    return res
+      .status(201)
+      .cookie("access_token", token, {
+        httpOnly: true,
+      })
+      .json(rest);
+  } catch (error) {
+    console.error("Error during Google sign-up:", error);
+    next(error);
+  }
+};
+
+export const googleSignIn = async (req, res, next) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    const { password, ...rest } = user._doc;
+    return res
+      .status(200)
+      .cookie("access_token", token, {
+        httpOnly: true,
+      })
+      .json(rest);
+  } catch (error) {
+    next(error);
+  }
+};

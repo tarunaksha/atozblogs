@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { clearMessages, setValidationError, signUp } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+import OAuth from "../components/OAuth";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({});
@@ -104,6 +105,7 @@ const SignUp = () => {
                 "Sign Up"
               )}
             </Button>
+            <OAuth isSignUp={true}/>
           </form>
           <div className="flex text-sm mt-5">
             <span>

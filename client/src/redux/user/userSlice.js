@@ -144,6 +144,24 @@ export const deleteUser = createAsyncThunk(
   }
 );
 
+export const signout = createAsyncThunk(
+  'user/signout',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch('/api/user/signout', {
+        method: 'POST',
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        return rejectWithValue(data.message || 'Failed to sign out');
+      }
+      return data;
+    } catch (error) {
+      return rejectWithValue('An unexpected error occurred. Please try again later');
+    }
+  }
+);
+
 
 const userSlice = createSlice({
   name: "user",
@@ -159,6 +177,9 @@ const userSlice = createSlice({
       state.successMessage = "";
     },
     setValidationError(state, action) {
+      state.errorMessage = action.payload;
+    },
+    setGlobalError(state, action) {
       state.errorMessage = action.payload;
     },
   },
@@ -252,9 +273,22 @@ const userSlice = createSlice({
       .addCase(deleteUser.rejected, (state, action) => {
         state.loading = false;
         state.errorMessage = action.payload;
+      }).addCase(signout.pending, (state) => {
+        state.loading = true;
+        state.errorMessage = null;
+        state.successMessage = null;
+      })
+      .addCase(signout.fulfilled, (state) => {
+        state.loading = false;
+        state.userInfo = null;
+        state.successMessage = 'User signed out successfully';
+      })
+      .addCase(signout.rejected, (state, action) => {
+        state.loading = false;
+        state.errorMessage = action.payload;
       });
   },
 });
 
-export const { clearMessages, setValidationError } = userSlice.actions;
+export const { clearMessages, setValidationError, setGlobalError } = userSlice.actions;
 export default userSlice.reducer;

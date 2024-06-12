@@ -4,20 +4,28 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme } from "../redux/theme/themeSlice";
+import { setGlobalError, signout } from "../redux/user/userSlice";
 
 const Header = () => {
   const path = useLocation().pathname;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { userInfo } = useSelector((state) => state.user);
-  const { theme } = useSelector((state) => state.theme); 
+  const { theme } = useSelector((state) => state.theme);
 
   const handleProfileClick = () => {
-    navigate('/dashboard?tab=profile');
+    navigate("/dashboard?tab=profile");
   };
 
-  const handleSignOutClick = () => {
-    navigate('/signout');
+  const handleSignOutClick = async () => {
+    try {
+      await dispatch(signout()).unwrap();
+      // Replace the current history entry to prevent back navigation
+      navigate("/signin", { replace: true });
+      window.history.replaceState(null, null, "/signin");
+    } catch (error) {
+      dispatch(setGlobalError(error.message));
+    }
   };
   return (
     <Navbar className="border-b-2">
@@ -62,13 +70,9 @@ const Header = () => {
                 {userInfo.email}
               </span>
             </Dropdown.Header>
-            <Dropdown.Item onClick={handleProfileClick}>
-            Profile
-          </Dropdown.Item>
-          <Dropdown.Divider />
-          <Dropdown.Item onClick={handleSignOutClick}>
-            Sign Out
-          </Dropdown.Item>
+            <Dropdown.Item onClick={handleProfileClick}>Profile</Dropdown.Item>
+            <Dropdown.Divider />
+            <Dropdown.Item onClick={handleSignOutClick}>Sign Out</Dropdown.Item>
           </Dropdown>
         ) : (
           <Link to="/signin">

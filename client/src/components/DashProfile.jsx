@@ -3,7 +3,7 @@ import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { clearMessages, deleteUser, updateUser } from "../redux/user/userSlice";
+import { clearMessages, deleteUser, signout, updateUser } from "../redux/user/userSlice";
 import {
   getDownloadURL,
   getStorage,
@@ -118,10 +118,22 @@ const DashProfile = () => {
       setLocalError(error.message);
     }
   };
+
   const handleDeleteUser = async () => {
     setShowModal(false);
     try {
       await dispatch(deleteUser({ userId: userInfo._id })).unwrap();
+      // Replace the current history entry to prevent back navigation
+      navigate("/signin", { replace: true });
+      window.history.replaceState(null, null, "/signin");
+    } catch (error) {
+      setLocalError(error.message);
+    }
+  }
+
+  const handleSignout = async () => {
+    try {
+      await dispatch(signout()).unwrap();
       // Replace the current history entry to prevent back navigation
       navigate("/signin", { replace: true });
       window.history.replaceState(null, null, "/signin");
@@ -210,7 +222,7 @@ const DashProfile = () => {
         >
           Delete account
         </span>
-        <span className="cursor-pointer text-red-500">Sign out</span>
+        <span onClick={handleSignout} className="cursor-pointer text-red-500">Sign out</span>
       </div>
       {localError && <Alert color="failure">{localError}</Alert>}
       {errorMessage && <Alert color="failure">{errorMessage}</Alert>}

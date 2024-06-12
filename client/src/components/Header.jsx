@@ -1,5 +1,5 @@
 import { Avatar, Button, Dropdown, Navbar, TextInput } from "flowbite-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
@@ -8,8 +8,17 @@ import { toggleTheme } from "../redux/theme/themeSlice";
 const Header = () => {
   const path = useLocation().pathname;
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { userInfo } = useSelector((state) => state.user);
   const { theme } = useSelector((state) => state.theme); 
+
+  const handleProfileClick = () => {
+    navigate('/dashboard?tab=profile');
+  };
+
+  const handleSignOutClick = () => {
+    navigate('/signout');
+  };
   return (
     <Navbar className="border-b-2">
       <Link
@@ -53,13 +62,13 @@ const Header = () => {
                 {userInfo.email}
               </span>
             </Dropdown.Header>
-            <Dropdown.Item>
-              <Link to="/dashboard?tab=profile">Profile</Link>
-            </Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item>
-              <Link to="/signout">Sign Out</Link>
-            </Dropdown.Item>
+            <Dropdown.Item onClick={handleProfileClick}>
+            Profile
+          </Dropdown.Item>
+          <Dropdown.Divider />
+          <Dropdown.Item onClick={handleSignOutClick}>
+            Sign Out
+          </Dropdown.Item>
           </Dropdown>
         ) : (
           <Link to="/signin">

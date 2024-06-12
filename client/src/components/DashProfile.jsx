@@ -1,7 +1,9 @@
-import { Alert, Button, TextInput } from "flowbite-react";
+import { Alert, Button, Modal, TextInput } from "flowbite-react";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { clearMessages, updateUser } from "../redux/user/userSlice";
+import { clearMessages, deleteUser, updateUser } from "../redux/user/userSlice";
 import {
   getDownloadURL,
   getStorage,
@@ -11,6 +13,7 @@ import {
 import { app } from "../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import { set } from "mongoose";
 
 const DashProfile = () => {
   const { userInfo, errorMessage, successMessage } = useSelector(
@@ -18,11 +21,13 @@ const DashProfile = () => {
   );
   const filePickerRef = useRef();
   const dispatch = useDispatch();
+  const navigate = useNavigate(); 
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
   const [imageFileUploadError, setImageFileUploadError] = useState(null);
   const [imageFileUploading, setImageFileUploading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({});
   const [originalData, setOriginalData] = useState({});
   const [localError, setLocalError] = useState(null);
@@ -113,6 +118,17 @@ const DashProfile = () => {
       setLocalError(error.message);
     }
   };
+  const handleDeleteUser = async () => {
+    setShowModal(false);
+    try {
+      await dispatch(deleteUser({ userId: userInfo._id })).unwrap();
+      // Replace the current history entry to prevent back navigation
+      navigate("/signin", { replace: true });
+      window.history.replaceState(null, null, "/signin");
+    } catch (error) {
+      setLocalError(error.message);
+    }
+  }
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
       <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1>
@@ -186,14 +202,42 @@ const DashProfile = () => {
         <Button type="submit" className="" gradientDuoTone="greenToBlue">
           Update
         </Button>
-        {localError && <Alert color="failure">{localError}</Alert>}
-        {errorMessage && <Alert color="failure">{errorMessage}</Alert>}
-        {successMessage && <Alert color="success">{successMessage}</Alert>}
       </form>
       <div className="mt-4 flex justify-between">
-        <span className="cursor-pointer text-red-500">Delete account</span>
+        <span
+          onClick={() => setShowModal(true)}
+          className="cursor-pointer text-red-500"
+        >
+          Delete account
+        </span>
         <span className="cursor-pointer text-red-500">Sign out</span>
       </div>
+      {localError && <Alert color="failure">{localError}</Alert>}
+      {errorMessage && <Alert color="failure">{errorMessage}</Alert>}
+      {successMessage && <Alert color="success">{successMessage}</Alert>}
+      <Modal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        popup
+        size="md"
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
+            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">Are you sure you want to delete your account?</h3>
+            <div className="flex items-center justify-center gap-4">
+              <Button color="failure" className="mr-2" onClick={handleDeleteUser}>
+                Yes, I&apos;m sure
+              </Button>
+              <Button gradientDuoTone="greenToBlue" onClick={() => setShowModal(false)}>
+                No, cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+          
+      </Modal>
     </div>
   );
 };

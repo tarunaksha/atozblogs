@@ -124,6 +124,26 @@ export const updateUser = createAsyncThunk(
   }
 );
 
+export const deleteUser = createAsyncThunk(
+  "user/deleteUser",
+  async ({userId}, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`/api/user/delete/${userId}`, {
+        method: "DELETE"
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        return rejectWithValue(data.message || 'Failed to delete user');
+      }
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        'An unexpected error occurred. Please try again later'
+      );
+    }
+  }
+);
+
 
 const userSlice = createSlice({
   name: "user",
@@ -219,6 +239,19 @@ const userSlice = createSlice({
         state.errorMessage =
           action.payload ||
           "An unexpected error occurred. Please try again later";
+      }).addCase(deleteUser.pending, (state) => {
+        state.loading = true;
+        state.errorMessage = null;
+        state.successMessage = null;
+      })
+      .addCase(deleteUser.fulfilled, (state) => {
+        state.loading = false;
+        state.userInfo = {};
+        state.successMessage = 'User deleted successfully';
+      })
+      .addCase(deleteUser.rejected, (state, action) => {
+        state.loading = false;
+        state.errorMessage = action.payload;
       });
   },
 });

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
+
 export const signUp = createAsyncThunk(
   "user/signUp",
   async ({ formData }, { rejectWithValue }) => {
@@ -99,6 +100,30 @@ export const googleSignIn = createAsyncThunk(
   }
 );
 
+export const updateUser = createAsyncThunk(
+  "user/updateUser",
+  async ({userId,formData}, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`/api/user/update/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        return rejectWithValue(data.message || "Failed to update user");
+      }
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        "An unexpected error occurred. Please try again later"
+      );
+    }
+  }
+);
+
 
 const userSlice = createSlice({
   name: "user",
@@ -175,6 +200,21 @@ const userSlice = createSlice({
         state.successMessage = "User created successfully";
       })
       .addCase(googleSignUp.rejected, (state, action) => {
+        state.loading = false;
+        state.errorMessage =
+          action.payload ||
+          "An unexpected error occurred. Please try again later";
+      }) .addCase(updateUser.pending, (state) => {
+        state.loading = true;
+        state.errorMessage = "";
+        state.successMessage = "";
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage = "User updated successfully";
+        state.userInfo = { ...state.userInfo, ...action.payload };
+      })
+      .addCase(updateUser.rejected, (state, action) => {
         state.loading = false;
         state.errorMessage =
           action.payload ||

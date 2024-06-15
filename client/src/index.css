@@ -2,3 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  height: 100vh;
+}
+
+.ql-editor {
+  height: 100%;
+  font-size: 1.05rem;
+  overflow-y: auto;
+}

@@ -1,9 +1,14 @@
 import { Alert, Button, Modal, TextInput } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { clearMessages, deleteUser, signout, updateUser } from "../redux/user/userSlice";
+import {
+  clearMessages,
+  deleteUser,
+  signout,
+  updateUser,
+} from "../redux/user/userSlice";
 import {
   getDownloadURL,
   getStorage,
@@ -13,15 +18,14 @@ import {
 import { app } from "../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import { set } from "mongoose";
 
 const DashProfile = () => {
-  const { userInfo, errorMessage, successMessage } = useSelector(
+  const { userInfo, errorMessage, successMessage, loading } = useSelector(
     (state) => state.user
   );
   const filePickerRef = useRef();
   const dispatch = useDispatch();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
@@ -129,7 +133,7 @@ const DashProfile = () => {
     } catch (error) {
       setLocalError(error.message);
     }
-  }
+  };
 
   const handleSignout = async () => {
     try {
@@ -140,7 +144,7 @@ const DashProfile = () => {
     } catch (error) {
       setLocalError(error.message);
     }
-  }
+  };
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
       <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1>
@@ -211,9 +215,20 @@ const DashProfile = () => {
           placeholder="password"
           onChange={handleChange}
         />
-        <Button type="submit" className="" gradientDuoTone="greenToBlue">
-          Update
+        <Button type="submit" className="" gradientDuoTone="greenToBlue" disabled={loading || imageFileUploading}>
+          {loading ? "Loading..." : "Update"}
         </Button>
+        {userInfo.isAdmin && (
+          <Link to={"/create-post"}>
+            <Button
+              type="button"
+              className="w-full"
+              gradientDuoTone="greenToBlue"
+            >
+              Create a post
+            </Button>
+          </Link>
+        )}
       </form>
       <div className="mt-4 flex justify-between">
         <span
@@ -222,7 +237,9 @@ const DashProfile = () => {
         >
           Delete account
         </span>
-        <span onClick={handleSignout} className="cursor-pointer text-red-500">Sign out</span>
+        <span onClick={handleSignout} className="cursor-pointer text-red-500">
+          Sign out
+        </span>
       </div>
       {localError && <Alert color="failure">{localError}</Alert>}
       {errorMessage && <Alert color="failure">{errorMessage}</Alert>}
@@ -237,18 +254,26 @@ const DashProfile = () => {
         <Modal.Body>
           <div className="text-center">
             <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
-            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">Are you sure you want to delete your account?</h3>
+            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">
+              Are you sure you want to delete your account?
+            </h3>
             <div className="flex items-center justify-center gap-4">
-              <Button color="failure" className="mr-2" onClick={handleDeleteUser}>
+              <Button
+                color="failure"
+                className="mr-2"
+                onClick={handleDeleteUser}
+              >
                 Yes, I&apos;m sure
               </Button>
-              <Button gradientDuoTone="greenToBlue" onClick={() => setShowModal(false)}>
+              <Button
+                gradientDuoTone="greenToBlue"
+                onClick={() => setShowModal(false)}
+              >
                 No, cancel
               </Button>
             </div>
           </div>
         </Modal.Body>
-          
       </Modal>
     </div>
   );

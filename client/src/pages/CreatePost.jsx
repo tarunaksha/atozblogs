@@ -13,7 +13,7 @@ import "react-circular-progressbar/dist/styles.css";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import {useNavigate} from "react-router-dom";
-import { set } from "mongoose";
+
 
 const CreatePost = () => {
   const navigate = useNavigate();

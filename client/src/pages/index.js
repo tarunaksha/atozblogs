@@ -6,6 +6,7 @@ export { default as SignUp } from "./SignUp";
 export { default as Projects } from "./Projects";
 export { default as CreatePost } from "./CreatePost";
 
+
 // OR THIS WAY
 
 // import SignIn from "./SignIn";

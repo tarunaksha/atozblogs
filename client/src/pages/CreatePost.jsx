@@ -12,13 +12,15 @@ import { app } from "../firebase";
 import "react-circular-progressbar/dist/styles.css";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import {useNavigate} from "react-router-dom";
 import { set } from "mongoose";
 
 const CreatePost = () => {
-  const [value, setValue] = useState("");
+  const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
   const [imageFileUploadError, setImageFileUploadError] = useState(null);
+  const [publishError, setPublishError] = useState(null);
   const [formData, setFormData] = useState({});
 
   const handleImageUpload = async () => {
@@ -56,11 +58,40 @@ const CreatePost = () => {
       setImageFileUploadProgress(null);
     }
   };
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("/api/post/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        if (data.statusCode === 500) {
+          setPublishError(
+            "Duplicate post title found, please change the title"
+          );
+          return;
+        }
+        setPublishError(data.message);
+        return;
+      } else {
+        setPublishError(null);
+        setFormData({});
+        setFile(null);
+        navigate(`/post/${data.slug}`);
+      }
+    } catch (error) {
+      setPublishError("Could not publish post");
+    }
+  };
   return (
     <div className="max-w-3xl min-h-screen mx-auto p-3">
       <h1 className="text-center text-3xl font-semibold my-4">Create a post</h1>
-      <form className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-4 sm:flex-row justify-between">
           <TextInput
             type="text"
@@ -68,8 +99,15 @@ const CreatePost = () => {
             placeholder="Enter the title of the post"
             className="flex-1"
             required
+            onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
           />
-          <Select>
+          <Select
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
+          >
             <option value="uncatagorized">Select a category</option>
             <option value="react">React</option>
             <option value="vue">Vue</option>
@@ -114,15 +152,20 @@ const CreatePost = () => {
         )}
         <ReactQuill
           theme="snow"
-          value={value}
-          onChange={setValue}
           className="h-72 mb-12"
           placeholder="Write something..."
           required
+          onChange={(value) => setFormData({ ...formData, content: value })}
         />
+        {publishError && (
+          <Alert color="failure" className="">
+            {publishError}
+          </Alert>
+        )}
         <Button type="submit" size="lg" gradientDuoTone="greenToBlue">
           Publish
         </Button>
+        
       </form>
     </div>
   );

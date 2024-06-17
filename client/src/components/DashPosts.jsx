@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 const DashPosts = () => {
   const { userInfo } = useSelector((state) => state.user);
   const [userPosts, setUserPosts] = useState([]);
+  const [showMore, setShowMore] = useState(true);
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -15,6 +16,9 @@ const DashPosts = () => {
         const data = await response.json();
         if (response.ok) {
           setUserPosts(data.posts);
+          if (data.posts.length < 9) {
+            setShowMore(false);
+          }
         }
       } catch (error) {
         console.error(error);
@@ -24,6 +28,24 @@ const DashPosts = () => {
       fetchPosts();
     }
   }, [userInfo._id]);
+
+  const handleShowMore = async () => {
+    const startIndex = userPosts.length;
+    try {
+      const response = await fetch(
+        `/api/post/getposts?userId=${userInfo._id}&startIndex=${startIndex}`
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setUserPosts((prevPosts) => [...prevPosts, ...data.posts]);
+        if (data.posts.length < 9) {
+          setShowMore(false);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
@@ -48,13 +70,13 @@ const DashPosts = () => {
                   </Table.Cell>
                   <Table.Cell>
                     <Link to={`/post/${post.slug}`}>
-                    <img
-                      src={post.image}
-                      alt={post.title}
-                      className="w-20 h-10 object-cover bg-gray-500"
-                    />
+                      <img
+                        src={post.image}
+                        alt={post.title}
+                        className="w-20 h-10 object-cover bg-gray-500"
+                      />
                     </Link>
-                    </Table.Cell>
+                  </Table.Cell>
                   <Table.Cell className="font-medium text-gray-900 dark:text-white">
                     <Link to={`/post/${post.slug}`}>{post.title}</Link>
                   </Table.Cell>
@@ -90,6 +112,14 @@ const DashPosts = () => {
               </Table.Body>
             ))}
           </Table>
+          {showMore && (
+            <button
+              className="w-full text-teal-500 self-center text-sm py-7 font-medium cursor-pointer hover:underline"
+              onClick={handleShowMore}
+            >
+              Show more
+            </button>
+          )}
         </>
       ) : (
         <p>You have no posts yet!</p>

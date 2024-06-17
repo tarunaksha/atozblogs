@@ -23,7 +23,7 @@ const SignIn = () => {
       [e.target.id]: e.target.value.trim(),
     });
   };
-
+  console.log(formData);
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
@@ -32,7 +32,7 @@ const SignIn = () => {
       return;
     }
     dispatch(clearMessages());
-    const resultAction = await dispatch(signIn(formData));
+    const resultAction = await dispatch(signIn({formData}));
     if (signIn.fulfilled.match(resultAction)) {
       navigate('/');
     }

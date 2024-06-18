@@ -16,7 +16,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const UpdatePost = () => {
-    const {userInfo} = useSelector((state) => state.user);
+  const { userInfo } = useSelector((state) => state.user);
   const { postId } = useParams();
   const navigate = useNavigate();
   const [file, setFile] = useState(null);
@@ -82,13 +82,16 @@ const UpdatePost = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`/api/post/updatepost/${formData._id}/${userInfo._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        `/api/post/updatepost/${formData._id}/${userInfo._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
       const data = await response.json();
       if (!response.ok) {
         if (data.statusCode === 500) {

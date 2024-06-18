@@ -23,7 +23,6 @@ const SignIn = () => {
       [e.target.id]: e.target.value.trim(),
     });
   };
-  console.log(formData);
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {

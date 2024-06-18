@@ -16,7 +16,6 @@ export const signup = async (req, res, next) => {
   ) {
     next(errorHandler(400, "All fields are required"));
   }
-
   const hashedPassword = bcryptjs.hashSync(password, 10);
   const newUser = new User({ username, email, password: hashedPassword });
 
@@ -24,7 +23,7 @@ export const signup = async (req, res, next) => {
     await newUser.save();
     return res.status(201).json({ message: "User created successfully" });
   } catch (error) {
-    next(error);
+    next(errorHandler(500, "Internal server error"));
   }
 };
 
@@ -62,7 +61,7 @@ export const signin = async (req, res, next) => {
       })
       .json(rest);
   } catch (error) {
-    next(error);
+    next(errorHandler(500, "Internal server error"));
   }
 };
 

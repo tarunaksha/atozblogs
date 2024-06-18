@@ -29,7 +29,7 @@ const SignUp = () => {
       return;
     }
     dispatch(clearMessages());
-    const resultAction = await dispatch(signUp(formData));
+    const resultAction = await dispatch(signUp({formData}));
     if (signUp.fulfilled.match(resultAction)) {
       navigate('/');
     }

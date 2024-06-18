@@ -5,7 +5,6 @@ export const signUp = createAsyncThunk(
   "user/signUp",
   async ({ formData }, { rejectWithValue }) => {
     try {
-      // console.log("signup method", signUpMethod);
       let url = "/api/auth/signup";
       const response = await fetch(url, {
         method: "POST",
@@ -15,7 +14,6 @@ export const signUp = createAsyncThunk(
         body: JSON.stringify(formData),
       });
       const data = await response.json();
-      console.log(data);
       if (!response.ok) {
         return rejectWithValue("User already exists");
       }

@@ -85,22 +85,42 @@ export const updatePost = async (req, res, next) => {
   if (!req.user.isAdmin || req.user.id !== req.params.userId) {
     return next(errorHandler(403, "You are not allowed to update this post"));
   }
+
   try {
+
+    const { title, content, category, image } = req.body;
+
+    // Fetch the current post
+    const post = await Post.findById(req.params.postId);
+    if (!post) {
+      return next(errorHandler(404, "Post not found"));
+    }
+
+    // Check if the title is being changed
+    if (post.title !== title) {
+      // Check for duplicate title
+      const existingPost = await Post.findOne({ title });
+      if (existingPost) {
+        return next(errorHandler(400, "Duplicate title found"));
+      }
+    }
+
+    // Update the post
     const updatedPost = await Post.findByIdAndUpdate(
       req.params.postId,
       {
         $set: {
-          title: req.body.title,
-          content: req.body.content,
-          category: req.body.category,
-          image: req.body.image,
+          title,
+          content,
+          category,
+          image,
         },
       },
       { new: true }
     );
+
     res.status(200).json(updatedPost);
   } catch (error) {
     next(errorHandler(500, error.message));
   }
 };
-

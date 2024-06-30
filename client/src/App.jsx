@@ -8,6 +8,7 @@ import {
   Projects,
   CreatePost,
   UpdatePost,
+  PostPage,
 } from "./pages";
 import {
   Header,
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/create-post" element={<CreatePost />} />
           <Route path="/update-post/:postId" element={<UpdatePost />} />
         </Route>
+        <Route path="/post/:postSlug" element={<PostPage />} />
       </Routes>
       <Footer />
     </BrowserRouter>

@@ -23,11 +23,11 @@ const UpdatePost = () => {
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
   const [imageFileUploadError, setImageFileUploadError] = useState(null);
   const [publishError, setPublishError] = useState(null);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({ image: "" });
 
   useEffect(() => {
-    const fetchPost = async () => {
-      try {
+    try {
+      const fetchPost = async () => {
         const response = await fetch(`/api/post/getposts?postId=${postId}`);
         const data = await response.json();
         if (!response.ok) {
@@ -35,14 +35,20 @@ const UpdatePost = () => {
           return;
         } else {
           setPublishError(null);
-          setFormData(data.posts[0]);
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            ...data.posts[0], // Merge existing fields with fetched data
+          })); // Update with existing image URL
         }
-      } catch (error) {
-        setPublishError("Could not fetch post");
-      }
-    };
-    fetchPost();
+      };
+      fetchPost();
+    } catch (error) {
+      setPublishError("Could not fetch post");
+    }
   }, [postId]);
+ 
+    
+
 
   const handleImageUpload = async () => {
     try {
@@ -79,11 +85,12 @@ const UpdatePost = () => {
       setImageFileUploadProgress(null);
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `/api/post/updatepost/${formData._id}/${userInfo._id}`,
+        `/api/post/updatepost/${postId}/${userInfo._id}`,
         {
           method: "PUT",
           headers: {
@@ -95,9 +102,7 @@ const UpdatePost = () => {
       const data = await response.json();
       if (!response.ok) {
         if (data.statusCode === 500) {
-          setPublishError(
-            "Duplicate post title found, please change the title"
-          );
+          setPublishError("Could not update post. Please try again later");
           return;
         }
         setPublishError(data.message);
@@ -112,6 +117,7 @@ const UpdatePost = () => {
       setPublishError("Could not update post");
     }
   };
+
   return (
     <div className="max-w-3xl min-h-screen mx-auto p-3">
       <h1 className="text-center text-3xl font-semibold my-4">Update post</h1>
@@ -174,7 +180,7 @@ const UpdatePost = () => {
           <Alert color="failure">{imageFileUploadError}</Alert>
         )}
         {formData.image && (
-          <img src={formData.image} alt="upload" className="w-full h-72" />
+          <img src={formData.image} alt="post-image" className="w-full h-72" />
         )}
         <ReactQuill
           theme="snow"

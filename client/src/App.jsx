@@ -15,11 +15,13 @@ import {
   Footer,
   PrivateRoute,
   OnlyAdminPrivateRoute,
+  ScrollToTopComp,
 } from "./components";
 
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTopComp />
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />

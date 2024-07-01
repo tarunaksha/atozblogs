@@ -7,3 +7,5 @@ export { default as DashUsers } from "./DashUsers";
 export {default as PrivateRoute} from "./PrivateRoute";
 export {default as OnlyAdminPrivateRoute} from "./OnlyAdminPrivateRoute";
 export {default as CallToAction} from "./CallToAction";
+export {default as CommentSection} from "./CommentSection";
+export {default as ScrollToTopComp} from "./ScrollToTopComp";

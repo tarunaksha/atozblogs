@@ -1,14 +1,17 @@
+/* eslint-disable react/prop-types */
 import { Alert, Button, Textarea } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import Comments from "./Comment";
+import { Link, useNavigate } from "react-router-dom";
+import Comment from "./Comment";
 
 const CommentSection = ({ postId }) => {
   const { userInfo } = useSelector((state) => state.user);
+  const navigate = useNavigate();
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
   const [commentError, setCommentError] = useState(null);
+  const [users, setUsers] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,6 +54,54 @@ const CommentSection = ({ postId }) => {
     };
     fetchComments();
   }, [postId]);
+
+  const handleLike = async (commentId) => {
+    try {
+      if (!userInfo) {
+        navigate("/signin");
+        return;
+      }
+      const res = await fetch(`/api/comment/likeComment/${commentId}`, {
+        method: "PUT",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setComments((prev) =>
+          prev.map((comment) =>
+            comment._id === commentId ? { ...comment, ...data } : comment
+          )
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchUsers = async (userIds) => {
+    const usersData = {};
+    for (const userId of userIds) {
+      if (!users[userId]) {
+        try {
+          const res = await fetch(`/api/user/${userId}`);
+          const data = await res.json();
+          if (res.ok) {
+            usersData[userId] = data; 
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    }
+    setUsers((prevUsers) => ({
+      ...prevUsers,
+      ...usersData,
+    }));
+  };
+
+  useEffect(() => {
+    const userIds = [...new Set(comments.map((comment) => comment.userId))];
+    fetchUsers(userIds);
+  }, [comments]);
 
   return (
     <div className="max-w-2xl mx-auto w-full p-3">
@@ -113,9 +164,17 @@ const CommentSection = ({ postId }) => {
               <p>{comments.length}</p>
             </div>
           </div>
-          {comments.map((comment) => (
-            <Comments key={comment._id} comment={comment} />
-          ))}
+          {comments.map(
+            (comment) =>
+              users[comment.userId] && (
+                <Comment
+                  key={comment._id}
+                  comment={comment}
+                  onLike={handleLike}
+                  user={users[comment.userId]}
+                />
+              )
+          )}
         </>
       )}
     </div>

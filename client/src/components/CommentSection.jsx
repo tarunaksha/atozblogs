@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import Comment from "./Comment";
+import { set } from "mongoose";
 
 const CommentSection = ({ postId }) => {
   const { userInfo } = useSelector((state) => state.user);
@@ -103,6 +104,10 @@ const CommentSection = ({ postId }) => {
     fetchUsers(userIds);
   }, [comments]);
 
+  const handleEdit = async (comment, editedComment) => {
+   setComments(comments.map((c) => c._id === comment._id ? {...c, content: editedComment} : c));
+  };
+
   return (
     <div className="max-w-2xl mx-auto w-full p-3">
       {userInfo ? (
@@ -169,9 +174,10 @@ const CommentSection = ({ postId }) => {
               users[comment.userId] && (
                 <Comment
                   key={comment._id}
+                  user={users[comment.userId]}
                   comment={comment}
                   onLike={handleLike}
-                  user={users[comment.userId]}
+                  onEdit={handleEdit}
                 />
               )
           )}

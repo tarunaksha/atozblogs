@@ -10,3 +10,4 @@ export {default as CallToAction} from "./CallToAction";
 export {default as CommentSection} from "./CommentSection";
 export {default as ScrollToTopComp} from "./ScrollToTopComp";
 export {default as Comment} from "./Comment";
+export {default as PostCard} from "./PostCard";

@@ -1,13 +1,15 @@
 import { Button, Spinner } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { CallToAction, CommentSection } from "../components";
+import { CallToAction, CommentSection, PostCard } from "../components";
 
 const PostPage = () => {
   const { postSlug } = useParams();
   const [loading, setLoading] = useState(true);
+  const [loadingRecentPosts, setLoadingRecentPosts] = useState(true);
   const [error, setError] = useState(false);
   const [post, setPost] = useState(null);
+  const [recentPosts, setRecentPosts] = useState(null);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -33,7 +35,31 @@ const PostPage = () => {
     fetchPost();
   }, [postSlug]);
 
-  if (loading) {
+  useEffect(() => {
+    const fetchRecentPosts = async () => {
+      try { 
+        setLoadingRecentPosts(true);
+        const response = await fetch("/api/post/getposts?limit=3");
+        const data = await response.json();
+        if (!response.ok) {
+          setError(true);
+          setLoadingRecentPosts(false);
+          return;
+        } else {
+          setRecentPosts(data.posts);
+          setLoadingRecentPosts(false);
+          setError(false);
+        }
+      } catch (error) {
+        setError(true);
+        setLoadingRecentPosts(false);
+        console.error(error);
+      }
+    };
+    fetchRecentPosts();
+  }, []);
+
+  if (loading || loadingRecentPosts) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <Spinner size="xl" />
@@ -77,6 +103,15 @@ const PostPage = () => {
         <CallToAction />
       </div>
       <CommentSection postId={post._id} />
+      <div className="flex flex-col items-center justify-center mb-5">
+        <h1 className="text-xl mt-5">Recent articles</h1>
+        <div className="flex flex-wrap mt-5 gap-5 justify-center">
+          {recentPosts &&
+            recentPosts.map((post) => (
+              <PostCard key={post._id} post={post} />
+            ))}
+        </div>
+      </div>
     </main>
   );
 };

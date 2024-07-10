@@ -104,8 +104,7 @@ const Comment = ({ comment, onLike, onEdit,onDelete, user }) => {
                     (comment.numberOfLikes === 1 ? "like" : "likes")}
               </p>
               {userInfo &&
-                userInfo._id === comment.userId &&
-                userInfo.isAdmin && (
+                userInfo._id === comment.userId && (
                   <>
                     <button
                       type="button"

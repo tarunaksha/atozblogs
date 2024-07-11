@@ -12,3 +12,4 @@ export {default as ScrollToTopComp} from "./ScrollToTopComp";
 export {default as Comment} from "./Comment";
 export {default as PostCard} from "./PostCard";
 export {default as DashComments} from "./DashComments";
+export {default as DashboardComp} from "./DashboardComp";

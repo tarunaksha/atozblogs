@@ -5,13 +5,23 @@ import { FaMoon, FaSun } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme } from "../redux/theme/themeSlice";
 import { setGlobalError, signout } from "../redux/user/userSlice";
+import { useEffect, useState } from "react";
 
 const Header = () => {
   const path = useLocation().pathname;
+  const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { userInfo } = useSelector((state) => state.user);
   const { theme } = useSelector((state) => state.theme);
+  const [searchTerm, setSearchTerm] = useState("");
+
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const search = searchParams.get("searchTerm");
+    setSearchTerm(search || "");
+  }, [location.search]);
 
   const handleProfileClick = () => {
     navigate("/dashboard?tab=profile");
@@ -27,6 +37,15 @@ const Header = () => {
       dispatch(setGlobalError(error.message));
     }
   };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set("searchTerm", searchTerm);
+    const searchQuery = searchParams.toString();
+    navigate(`/search?${searchQuery}`);
+  };
+
   return (
     <Navbar className="border-b-2">
       <Link
@@ -38,12 +57,14 @@ const Header = () => {
         </span>
         Blogs
       </Link>
-      <form action="">
+      <form onSubmit={handleSubmit}>
         <TextInput
           type="text"
           placeholder="Search"
           rightIcon={AiOutlineSearch}
           className="hidden lg:inline md:inline"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
       </form>
       <Button className="w-12 h-8 lg:hidden md:hidden" color="gray" pill>

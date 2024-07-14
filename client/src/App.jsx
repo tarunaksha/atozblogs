@@ -9,6 +9,7 @@ import {
   CreatePost,
   UpdatePost,
   PostPage,
+  Search,
 } from "./pages";
 import {
   Header,
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/projects" element={<Projects />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/search" element={<Search />} />
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>

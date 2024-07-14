@@ -115,6 +115,12 @@ const CreatePost = () => {
             <option value="nextjs">Next JS</option>
             <option value="linux">Linux</option>
             <option value="windows">Windows</option>
+            <option value="games">Games</option>
+            <option value="anime">Anime</option>
+            <option value="manga">Manga</option>
+            <option value="comics">Comics</option>
+            <option value="books">Books</option>
+            <option value="movies">Movies</option>
           </Select>
         </div>
         <div className="flex gap-4 items-center justify-between border-4 border-blue-500 border-dotted p-3">

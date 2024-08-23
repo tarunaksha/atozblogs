@@ -3,21 +3,29 @@ import { Link } from "react-router-dom";
 
 const PostCard = ({ post }) => {
   return (
-    <div className="group relative w-full h-[350px] overflow-hidden rounded-lg sm:w-[350px] border border-teal-500 hover:border-2 transition-all">
-      <Link to={`/post/${post.slug}`}>
+    <div className="group relative w-full h-[400px] sm:w-[350px] overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-gray-800 dark:border-gray-700">
+      <Link to={`/post/${post.slug}`} className="block h-[260px]">
         <img
           src={post.image}
           alt="post cover"
-          className="h-[260px] w-full object-cover group-hover:h-[200px] transition-all duration-300 z-20"
+          className="h-full w-full object-fit rounded-t-lg transition-transform duration-300 transform group-hover:translate-y-[-25px]"
         />
       </Link>
-      <div className="flex flex-col p-3 gap-2">
-        <p className="text-lg font-semibold line-clamp-2">{post.title}</p>
-        <span className="italic text-sm">{post.category}</span>
-        <Link to={`/post/${post.slug}`} className="z-10 group-hover:bottom-0 absolute bottom-[-200px] left-0 right-0 border border-teal-500 text-teal-500 hover:bg-teal-500 hover:text-white transition-all duration-300 text-center py-2 rounded-md !rounded-tl-none m-2">
-            Read article
-        </Link>
+      <div className="p-4 flex flex-col gap-3 relative transition-transform duration-300 group-hover:translate-y-[-40px]">
+        <p className="text-lg font-bold line-clamp-2 group-hover:text-teal-600 transition-colors duration-200 dark:text-white">
+          {post.title}
+        </p>
+        <span className="text-sm text-gray-500 uppercase tracking-wide dark:text-gray-400">
+          {post.category}
+        </span>
       </div>
+      {/* Read Article button with more padding */}
+      <Link
+        to={`/post/${post.slug}`}
+        className="absolute bottom-[-50px] left-4 right-4 py-3 px-4 text-center bg-teal-500 text-white rounded-md transition-all duration-300 group-hover:bottom-4 dark:bg-teal-600 dark:hover:bg-teal-500"
+      >
+        Read Article
+      </Link>
     </div>
   );
 };
